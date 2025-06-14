@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	_ "image/jpeg"
@@ -50,6 +51,17 @@ func main() {
 				return
 			}
 			defer reader.Close()
+
+			imgData, _, err := image.Decode(reader)
+			if err != nil {
+				label.SetText("Failed to decode image,")
+				return
+			}
+
+			domColor := getDominantColor(imgData)
+
+			rgba := domColor.(color.RGBA)
+			hex := fmt.Sprintf("#%02X%02X%02X", rgba.R, rgba.G, rgba.B)
 		})
 	})
 }
