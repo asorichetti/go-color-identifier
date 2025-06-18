@@ -9,6 +9,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
@@ -30,6 +31,7 @@ func getDominantColor(img image.Image) color.Color {
 			count++
 		}
 	}
+
 	rAvg := rTotal / count
 	gAvg := gTotal / count
 	bAvg := bTotal / count
@@ -54,7 +56,7 @@ func main() {
 
 			imgData, _, err := image.Decode(reader)
 			if err != nil {
-				label.SetText("Failed to decode image,")
+				label.SetText("Failed to decode image.")
 				return
 			}
 
@@ -62,6 +64,24 @@ func main() {
 
 			rgba := domColor.(color.RGBA)
 			hex := fmt.Sprintf("#%02X%02X%02X", rgba.R, rgba.G, rgba.B)
-		})
+
+			// Update UI
+			label.SetText(fmt.Sprintf("Dominant color: R:%d G:%d B:%d (%s)", rgba.R, rgba.G, rgba.B, hex))
+			colorBox := canvas.NewRectangle(domColor)
+			colorBox.SetMinSize(fyne.NewSize(100, 100))
+
+			imageBox.Objects = []fyne.CanvasObject{colorBox}
+			imageBox.Refresh()
+		}, myWindow)
 	})
+
+	myWindow.SetContent(container.NewVBox(
+		label,
+		uploadButton,
+		imageBox,
+		colorLabel,
+	))
+
+	myWindow.Resize(fyne.NewSize(400, 300))
+	myWindow.ShowAndRun()
 }
